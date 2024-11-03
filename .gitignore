@@ -1,0 +1,14 @@
+# Ignore environment variable files
+.env
+
+# Ignore archived folders
+archived/
+
+# Ignore database folders
+db/
+
+# Ignore all database files
+*.db
+
+# Ignore batch files
+*.bat
