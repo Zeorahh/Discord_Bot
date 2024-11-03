@@ -14,9 +14,11 @@ def initialize_db():
     #
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            level INTEGER DEFAULT 0,
-            balance REAL DEFAULT 0.0
+            id INTEGER PRIMARY KEY, -- 0 index
+            level INTEGER DEFAULT 0, -- 1 index
+            balance REAL DEFAULT 0.0, -- 2 index
+            xp INTEGER DEFAULT 0, -- 3 index
+            luck REAL DEFAULT 1.0 -- 4 index
         )
     ''')
     db_connection.commit()
@@ -46,6 +48,6 @@ def register_new_user(member : discord.Member) -> bool:
 # this cycles through all current users in active users and saves them to the database
 def update_all_users(active_users : dict) -> None:
     cursor = db_connection.cursor()
-    cursor.executemany("UPDATE users SET lvl = ?, balance = ? WHERE id = ?",
-                       [(user.level, user.balance, user.user_id) for user in active_users.values()])
+    cursor.executemany("UPDATE users SET level = ?, balance = ? , xp = ?, luck = ?WHERE id = ?",
+                       [(user.level, user.balance, user.xp, user.luck, user.user_id) for user in active_users.values()])
     db_connection.commit()

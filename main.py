@@ -20,7 +20,7 @@ intents.message_content = True # can read messages
 intents.members = True # can look at members
 
 # setting up the bot and the prefix 
-bot = commands.Bot(command_prefix="`", intents = intents)
+bot = commands.Bot(command_prefix=".", intents = intents)
 
 # events that trigger on the bot startup
 @bot.event
