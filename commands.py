@@ -140,7 +140,53 @@ def register_commands(bot):
         else:
             await ctx.reply(f"{member.display_name} was not in the database.")
 
-    # slots!
-    @bot.command(name="slots")
-    async def slots(ctx, bet : float = None):
-        print("Slots")
+
+    @bot.command(name="slots", description="rolls a slot, takes $10 per use")
+    async def slots(ctx, times_spun : int = 1):
+        if times_spun <= 0:
+            await ctx.reply("Error: you must spin at least once.")
+            return
+        if times_spun * 10 > active_users[ctx.author.id].balance:
+            await ctx.reply("Error: you don't have enough money to spin.")
+            return
+        current_user : User = active_users[ctx.author.id]
+        current_user.balance -= times_spun * 10
+        await ctx.send(f"You spent ${times_spun * 10} on slots.")
+        luck = current_user.luck
+        total_won : float = 0.0
+        for _ in range(times_spun):
+            array = [random.randint(1, 10) for _ in range(10)]
+            print("Array:", array)
+            # Initialize variables to keep track of the longest consecutive count
+            temp_longest_concurrent = 0
+            longest_concurrent = 0
+
+            for j in range(1, len(array)):
+                # Check if the current element is the same as the previous one
+                if array[j] == array[j - 1]:
+                    temp_longest_concurrent += 1  # Increase the current streak
+                else:
+                    # Update longest streak if current streak is longer
+                    if temp_longest_concurrent > longest_concurrent:
+                        longest_concurrent = temp_longest_concurrent
+                    temp_longest_concurrent = 1  # Reset current streak
+
+            # Final check for the longest streak
+            if temp_longest_concurrent > longest_concurrent:
+                longest_concurrent = temp_longest_concurrent
+            if random.random() < (luck - 1):
+                print("You got lucky!")
+                longest_concurrent += 1
+            mega_jackpots = 0
+            jackpots = 0
+            wins = 0
+            if longest_concurrent >= 6:
+                mega_jackpots += 1
+            if longest_concurrent >= 5:
+                jackpots += 1
+            elif longest_concurrent >= 3:
+                wins += 1
+            total_won += wins * 150 + jackpots * 2000 + mega_jackpots * 10000
+        total_won = round(total_won,2)
+        current_user.balance += total_won
+        await ctx.send(f"You won ${total_won}!")
