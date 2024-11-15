@@ -2,7 +2,9 @@
 from discord.ext import tasks
 from config import active_users
 from db_manager import update_all_users
-
+import os
+import datetime
+import shutil
 
 def start_scheduled_tasks(bot):
 
@@ -13,5 +15,6 @@ def start_scheduled_tasks(bot):
         update_all_users(active_users)
         active_users.clear()
         print("Database updated")
+
 
     update_db.start()

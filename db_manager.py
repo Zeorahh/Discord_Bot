@@ -2,6 +2,7 @@
 from config import db_connection
 from user_class import User
 import discord
+import sqlite3
 
 def initialize_db():
     cursor = db_connection.cursor()
@@ -18,7 +19,8 @@ def initialize_db():
             level INTEGER DEFAULT 0, -- 1 index
             balance REAL DEFAULT 0.0, -- 2 index
             xp INTEGER DEFAULT 0, -- 3 index
-            luck REAL DEFAULT 1.0 -- 4 index
+            luck REAL DEFAULT 1.0, -- 4 index
+            money_multiplier REAL DEFAULT 1.0 -- 5 index
         )
     ''')
     db_connection.commit()
@@ -47,7 +49,15 @@ def register_new_user(member : discord.Member) -> bool:
 
 # this cycles through all current users in active users and saves them to the database
 def update_all_users(active_users : dict) -> None:
-    cursor = db_connection.cursor()
-    cursor.executemany("UPDATE users SET level = ?, balance = ? , xp = ?, luck = ?WHERE id = ?",
-                       [(user.level, user.balance, user.xp, user.luck, user.user_id) for user in active_users.values()])
-    db_connection.commit()
+    print("Updating all users...")
+    try:
+        cursor = db_connection.cursor()
+        cursor.executemany("UPDATE users SET level = ?, balance = ?, xp = ?, luck = ?, money_multiplier = ? WHERE id = ?",
+                                [(user.level, user.balance, user.xp, user.luck, user.money_multiplier, user.user_id) for user in active_users.values()])
+        db_connection.commit()
+        print("All users succesfully saved!")
+    except sqlite3.DatabaseError as e:
+        print(f"Database error occured: {e}")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+    

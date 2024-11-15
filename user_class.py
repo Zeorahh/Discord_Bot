@@ -14,4 +14,22 @@ class User:
         self.balance : float = 0.0
 
         # other funny stats
-        self.luck : float = 1
+        self.luck : float = 1.0
+        self.money_multiplier : float = 1.0
+    
+    def get_required_xp(self):
+        return int(10 * (self.level ** (1+(self.level/100))))
+    def check_levelup(self):
+        print(f"XP: {self.xp}")
+        print(f"Level: {self.level}")
+        required_xp = self.get_required_xp()
+        # calculates the required XP for the next level
+        if self.xp >= required_xp:
+            self.xp -= required_xp
+            self.level += 1
+            
+            # todo:
+            # figure out how to send a message through the discord bot
+            # even though this is a class
+            return True
+        return False
