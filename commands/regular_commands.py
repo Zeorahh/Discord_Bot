@@ -121,6 +121,35 @@ def setup_regular(bot):
         user_beg_cooldown[ctx.author.id] = datetime.now()
 
 
+    # give command, gives people money
+    @bot.command(name = "give")
+    async def give(ctx, member : discord.Member, amount : float):
+        if member is None:
+            await ctx.reply("you need to specify a user to give too")
+            return
+        if amount <= 0:
+            await ctx.reply("Error: you must give a positive amount.")
+            return
+        add_to_active_users(member)
+        # checks to see if both users are int he active users database
+        author = active_users.get(ctx.author.id)
+        if not author:
+            await ctx.reply(f"{ctx.author.display_name}, you need to register first.")
+            return
+        recipient = active_users.get(member.id)
+        if not recipient:
+            await ctx.reply(f"{member.display_name} is not a registered member")
+            return
+        if author.balance < amount:
+            await ctx.reply("Error: you don't have enough money.")
+            return
+        author.balance -= amount
+        recipient.balance += amount
+
+        embed = discord.Embed(title=f"{ctx.author.display_name} -> {member.display_name}")
+        embed.add_field(name = "", value = f"${author.balance:.2f} -> ${recipient.balance:.2f}")
+        await ctx.reply(embed=embed)
+        
 
     @bot.command(name="slots", description="rolls a slot, takes $10 per use")
     async def slots(ctx, times_spun : int = 1):
