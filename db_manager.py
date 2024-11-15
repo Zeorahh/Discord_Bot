@@ -16,7 +16,7 @@ def initialize_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY, -- 0 index
-            level INTEGER DEFAULT 0, -- 1 index
+            level INTEGER DEFAULT 1, -- 1 index
             balance REAL DEFAULT 0.0, -- 2 index
             xp INTEGER DEFAULT 0, -- 3 index
             luck REAL DEFAULT 1.0, -- 4 index

@@ -23,14 +23,15 @@ async def handle_message(bot, message):
     # xp handling
     try:
         print(active_users)
-        active_users.get(message.author.id).xp += 1
-        if active_users.get(message.author.id).check_levelup():
-            print("Successfully leveled up!")
-            # for some reason this doenst send?
-            # ask gpt
-            await message.channel.send(f"Congrats! <@{message.author.id}> you leveled up to level {active_users[message.author.id].level}")
-        else:
-            print("DEBUG: no level up ")
+        if active_users.get(message.author.id):
+            active_users.get(message.author.id).xp += 1
+            if active_users.get(message.author.id).check_levelup():
+                print("Successfully leveled up!")
+                # for some reason this doenst send?
+                # ask gpt
+                await message.channel.send(f"Congrats! <@{message.author.id}> you leveled up to level {active_users[message.author.id].level}")
+            else:
+                print("DEBUG: no level up ")
     except KeyError:
         print(f"User not in active database")
 

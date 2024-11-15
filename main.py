@@ -13,7 +13,6 @@ from tasks import start_scheduled_tasks
 # imports the files from the commands folder
 from commands import admin_commands, debug_commands, regular_commands
 
-
 # loads token from environment variable
 load_dotenv()
 
@@ -27,6 +26,8 @@ intents.members = True # can look at members
 bot = commands.Bot(command_prefix=".", intents = intents)
 
 # loads all the commands from the files
+# if you add new command files
+# you need to update this here
 admin_commands.setup_admin(bot)
 debug_commands.setup_debug(bot)
 regular_commands.setup_regular(bot)

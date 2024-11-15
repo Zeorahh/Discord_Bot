@@ -9,6 +9,9 @@ from config import active_users
 from general_functions import add_to_active_users
 import random
 
+# this is for the beg command 
+from datetime import datetime, timedelta
+user_beg_cooldown : dict = {}
 
 
 def setup_regular(bot):
@@ -75,6 +78,50 @@ def setup_regular(bot):
         embed.add_field(name = "Stats: ",value=f"Level: {user.level}\nXP: {user.xp}/{required_xp}\nBalance: ${user.balance:.2f}\nLuck: {user.luck*100}%")
         await ctx.reply(embed=embed)
     
+    @bot.command(name="beg")
+    async def beg(ctx):
+        print("DEBUG: beg")
+        current_user :User = active_users.get(ctx.author.id)
+        if current_user is None:
+            await ctx.reply(f"{ctx.author.display_name}, you need to register first.")
+            return
+        
+
+        # timeing stuff 
+        # most of this code is chatgpt as ive never used deltatime before
+        last_beg_time = user_beg_cooldown.get(ctx.author.id) # checks if the user has any beg time
+        if last_beg_time is not None: # if they begged before
+            time_difference = datetime.now() - last_beg_time
+            
+            if time_difference < timedelta(hours=1):
+                if ctx.author.guild_permissions.administrator:
+                    await ctx.reply(f"admin perms abused...")
+                else:
+                    await ctx.reply(f"{ctx.author.display_name}, you can only beg once every hour.")
+                    return
+        
+        # actually dealing with the money now
+        luck = current_user.luck
+        money_mult = current_user.money_multiplier
+
+        # first roll to see if you even earn any money
+        # should be around a 75% change normally
+        chance_roll = random.random() * luck
+        print(f"DEBUG: rolled a {chance_roll}")
+        if chance_roll < 0.25:
+            await ctx.reply("No one bothered to help you...")
+        else:
+            # second roll to see how much money you earn
+            
+            money_roll = round(random.random() * luck * 10 * money_mult,2)
+            current_user.balance += money_roll
+            await ctx.send(f"You recieved ${money_roll} from begging")
+        
+        # updating the cooldown
+        user_beg_cooldown[ctx.author.id] = datetime.now()
+
+
+
     @bot.command(name="slots", description="rolls a slot, takes $10 per use")
     async def slots(ctx, times_spun : int = 1):
         if times_spun <= 0:
